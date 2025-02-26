@@ -29,7 +29,7 @@ namespace AmazonEventBridge
         }
 
         [Function("Func_Consume")]
-        public async Task Run([TimerTrigger("0 */5 * * * *")] TimerInfo myTimer)
+        public async Task Run([TimerTrigger("0 */2 * * * *")] TimerInfo myTimer)
         {
             _logger.LogInformation($"Azure Function triggered at: {DateTime.UtcNow}");
 

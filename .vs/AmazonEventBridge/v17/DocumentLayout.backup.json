@@ -1,0 +1,71 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\AccretionProjects\\AmazonEventBridge\\AmazonEventBridge\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{420523AB-AFAC-4BFD-9DE3-B182EAB8CCE9}|AmazonEventBridge\\AmazonEventBridge.csproj|d:\\accretionprojects\\amazoneventbridge\\amazoneventbridge\\amazoneventbridge\\func_consume.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{420523AB-AFAC-4BFD-9DE3-B182EAB8CCE9}|AmazonEventBridge\\AmazonEventBridge.csproj|solutionrelative:amazoneventbridge\\func_consume.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{420523AB-AFAC-4BFD-9DE3-B182EAB8CCE9}|AmazonEventBridge\\AmazonEventBridge.csproj|d:\\accretionprojects\\amazoneventbridge\\amazoneventbridge\\amazoneventbridge\\func_publish.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{420523AB-AFAC-4BFD-9DE3-B182EAB8CCE9}|AmazonEventBridge\\AmazonEventBridge.csproj|solutionrelative:amazoneventbridge\\func_publish.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C9725A76-F06C-4630-AFD4-1764EFCDAF50}|Solution Items{C9725A76-F06C-4630-AFD4-1764EFCDAF50}|D:\\AccretionProjects\\AmazonEventBridge\\AmazonEventBridge\\Readme.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}",
+      "RelativeMoniker": "D:0:0:{C9725A76-F06C-4630-AFD4-1764EFCDAF50}|Solution Items{C9725A76-F06C-4630-AFD4-1764EFCDAF50}|solutionrelative:Readme.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Func_Consume.cs",
+              "DocumentMoniker": "D:\\AccretionProjects\\AmazonEventBridge\\AmazonEventBridge\\AmazonEventBridge\\Func_Consume.cs",
+              "RelativeDocumentMoniker": "AmazonEventBridge\\Func_Consume.cs",
+              "ToolTip": "D:\\AccretionProjects\\AmazonEventBridge\\AmazonEventBridge\\AmazonEventBridge\\Func_Consume.cs",
+              "RelativeToolTip": "AmazonEventBridge\\Func_Consume.cs",
+              "ViewState": "AgIAABcAAAAAAAAAAAAuwDAAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-26T18:30:40.091Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Func_Publish.cs",
+              "DocumentMoniker": "D:\\AccretionProjects\\AmazonEventBridge\\AmazonEventBridge\\AmazonEventBridge\\Func_Publish.cs",
+              "RelativeDocumentMoniker": "AmazonEventBridge\\Func_Publish.cs",
+              "ToolTip": "D:\\AccretionProjects\\AmazonEventBridge\\AmazonEventBridge\\AmazonEventBridge\\Func_Publish.cs",
+              "RelativeToolTip": "AmazonEventBridge\\Func_Publish.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-26T18:30:36.25Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Readme.md",
+              "DocumentMoniker": "D:\\AccretionProjects\\AmazonEventBridge\\AmazonEventBridge\\Readme.md",
+              "RelativeDocumentMoniker": "Readme.md",
+              "ToolTip": "D:\\AccretionProjects\\AmazonEventBridge\\AmazonEventBridge\\Readme.md",
+              "RelativeToolTip": "Readme.md",
+              "ViewState": "AgIAAG0AAAAAAAAAAAAkwHQAAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
+              "WhenOpened": "2025-02-26T18:12:55.461Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

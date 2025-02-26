@@ -31,6 +31,29 @@ aws --endpoint-url=http://localhost:4566 events put-targets \
     --targets "[{\"Id\":\"1\",\"Arn\":\"arn:aws:sqs:us-east-1:000000000000:StudentEventQueue\"}]"
 ````
 
+
+
+
+If you get error in above command the create the rule
+Create the StudentRule before adding the target:
+```cmd
+aws --endpoint-url=http://localhost:4566 events put-rule \
+    --name StudentRule \
+    --event-bus-name StudentEventBus \
+    --event-pattern '{ "source": ["student.events"] }' \
+    --state ENABLED
+```
+
+Confirm that the rule was created:
+```cmd
+aws --endpoint-url=http://localhost:4566 events list-rules --event-bus-name StudentEventBus
+```
+
+
+
+
+
+
 4. Allow EventBridge to send messages to SQS:
 ````cmd
 aws --endpoint-url=http://localhost:4566 sqs set-queue-attributes \
