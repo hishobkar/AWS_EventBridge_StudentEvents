@@ -1,7 +1,159 @@
-﻿
+﻿# Azure Functions with AWS EventBridge in LocalStack
+
+This guide provides a step-by-step approach to consuming events in a **chronological manner** using **Azure Functions**, **AWS EventBridge**, and **LocalStack**.
+
+## Prerequisites
+
+- Docker installed on your machine
+- AWS CLI and LocalStack CLI installed
+- Azure Functions Core Tools installed
+
+---
+
+## Step 1: Start LocalStack Container
+
+Run LocalStack in a Docker container:
+
+```sh
+docker run -d --name localstack -p 4566:4566 -p 4510-4559:4510-4559 localstack/localstack
+```
+
+This ensures all AWS services (SQS, EventBridge, etc.) are available locally.
+
+---
+
+## Step 2: Install AWS CLI and LocalStack CLI
+
+If not installed, install the AWS CLI and LocalStack CLI:
+
+```sh
+pip install awscli-local
+```
+
+Configure LocalStack:
+
+```sh
+aws configure set aws_access_key_id fake
+aws configure set aws_secret_access_key fake
+aws configure set region us-east-1
+```
+
+Set environment variables:
+
+```sh
+export AWS_ACCESS_KEY_ID=fake
+export AWS_SECRET_ACCESS_KEY=fake
+export AWS_DEFAULT_REGION=us-east-1
+```
+
+---
+
+## Step 3: Create AWS Resources in LocalStack
+
+### 1. Create an SQS Queue
+
+```sh
+awslocal sqs create-queue --queue-name StudentEventQueue
+```
+
+### 2. Create an EventBridge Event Bus
+
+```sh
+awslocal events create-event-bus --name StudentEventBus
+```
+
+### 3. Create an EventBridge Rule to Send Events to SQS
+
+```sh
+awslocal events put-rule --name StudentEventRule --event-bus-name StudentEventBus --event-pattern '{"source": ["com.student.registration"]}'
+```
+
+### 4. Create an SQS Target for the EventBridge Rule
+
+```sh
+awslocal events put-targets --rule StudentEventRule --event-bus-name StudentEventBus --targets "[{\"Id\":\"1\", \"Arn\":\"$(awslocal sqs get-queue-attributes --queue-url http://localhost:4566/000000000000/StudentEventQueue --attribute-name QueueArn --query Attributes.QueueArn --output text)\"}]"
+```
+
+### 5. Give EventBridge Permissions to Write to SQS
+
+```sh
+awslocal sqs set-queue-attributes --queue-url http://localhost:4566/000000000000/StudentEventQueue --attributes '{"Policy":"{\"Version\": \"2012-10-17\", \"Statement\": [{ \"Effect\": \"Allow\", \"Principal\": \"*\", \"Action\": \"sqs:SendMessage\", \"Resource\": \"*\"}]}"}'
+```
+
+---
+
+## Step 4: Deploy and Run the Azure Functions
+
+### 1. Run Azure Functions Locally
+
+Ensure Azure Functions Core Tools are installed, then start the function:
+
+```sh
+func start
+```
+
+### 2. Test the Publish Function
+
+Send a test event:
+
+```sh
+curl -X POST "http://localhost:7071/api/PublishEvent" -H "Content-Type: application/json" -d '{"StudentID": "123", "Firstname": "John", "Lastname": "Doe", "DateOfBirth": "2000-01-01"}'
+```
+
+---
+
+## Step 5: Verify Message Processing
+
+Check if the event is received in SQS:
+
+```sh
+awslocal sqs receive-message --queue-url http://localhost:4566/000000000000/StudentEventQueue
+```
+
+If successful, Azure Function `Func_Consume` will process and delete it.
+
+---
+
+## Step 6: Monitor Logs
+
+Check LocalStack logs:
+
+```sh
+docker logs -f localstack
+```
+
+Check Azure Function logs:
+
+```sh
+func logs
+```
+
+Ensure messages are consumed in the correct order.
+
+---
+
+## Step 7: Cleanup
+
+To stop and remove LocalStack:
+
+```sh
+docker stop localstack && docker rm localstack
+```
+
+---
+
+## Summary
+
+This step-by-step guide helps you set up an **Azure Function** that publishes and consumes events from **AWS EventBridge** via **SQS in LocalStack**, ensuring chronological order of processing.
+
+
+
+
+
 ## Install AWS SDK for .NET
 
 dotnet add package AWSSDK.EventBridge
+
 dotnet add package AWSSDK.SQS
 
 

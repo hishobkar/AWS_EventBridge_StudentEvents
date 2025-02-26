@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Amazon.SQS;
 using Amazon.SQS.Model;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace AmazonEventBridge
 {
@@ -13,7 +15,7 @@ namespace AmazonEventBridge
     {
         private readonly ILogger<Func_Consume> _logger;
         private readonly AmazonSQSClient _sqsClient;
-        private const string QUEUE_URL = "http://localhost:4566/000000000000/StudentEventQueue";
+        private const string QUEUE_URL = "http://sqs.us-east-1.localhost.localstack.cloud:4566/000000000000/StudentEventQueue";
 
         public Func_Consume(ILogger<Func_Consume> logger)
         {
@@ -51,21 +53,28 @@ namespace AmazonEventBridge
                     return;
                 }
 
-                foreach (var message in response.Messages)
+
+                // Deserialize and extract timestamp
+                var events = response.Messages
+                    .Select(m => new
+                    {
+                        Message = m,
+                        Event = JsonConvert.DeserializeObject<StudentRegisteredEvent>(m.Body),
+                        Timestamp = JsonConvert.DeserializeObject<StudentRegisteredEvent>(m.Body).Time // Ensure Timestamp field exists in Student class
+                    })
+                    .OrderBy(e => e.Timestamp) // Sort chronologically
+                    .ToList();
+
+                foreach (var item in events)
                 {
-                    _logger.LogInformation($"Processing event: {message.Body}");
+                    _logger.LogInformation($"Processing event: {item.Message.Body}");
+                    _logger.LogInformation($"Student ID: {item.Event.Detail.StudentID}, Name: {item.Event.Detail.Firstname} {item.Event.Detail.Lastname}, DOB: {item.Event.Detail.DateOfBirth}, Timestamp: {item.Timestamp}");
 
-                    // Deserialize event message
-                    var studentEvent = JsonSerializer.Deserialize<Student>(message.Body);
-
-                    // Log event details (Replace with actual processing logic)
-                    _logger.LogInformation($"Student ID: {studentEvent.StudentID}, Name: {studentEvent.Firstname} {studentEvent.Lastname}, DOB: {studentEvent.DateOfBirth}");
-
-                    // Delete the message after processing
+                    // Delete processed message
                     var deleteRequest = new DeleteMessageRequest
                     {
                         QueueUrl = QUEUE_URL,
-                        ReceiptHandle = message.ReceiptHandle
+                        ReceiptHandle = item.Message.ReceiptHandle
                     };
                     await _sqsClient.DeleteMessageAsync(deleteRequest);
                 }
