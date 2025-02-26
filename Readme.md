@@ -5,6 +5,30 @@ dotnet add package AWSSDK.EventBridge
 dotnet add package AWSSDK.SQS
 
 
+## a. Start LocalStack with EventBridge
+```cmd
+docker run -d --name localstack -p 4566:4566 -p 4510-4559:4510-4559 localstack/localstack
+```
+
+## b. Ensure that EventBridge is running by executing:
+```cmd
+aws --endpoint-url=http://localhost:4566 events list-rules
+```
+
+## c. Configure AWS CLI with Dummy Credentials
+Run the following command to set up AWS CLI with fake credentials:
+```cmd
+aws configure set aws_access_key_id test
+```
+
+```cmd
+aws configure set aws_secret_access_key test
+```
+
+```cmd
+aws configure set default.region us-east-1
+```
+
 ## Create an SQS Queue and Subscribe It to EventBridge
 
 Since EventBridge does not support direct polling, set up AWS SQS as a subscriber:
@@ -32,8 +56,6 @@ aws --endpoint-url=http://localhost:4566 events put-targets \
 ````
 
 
-
-
 If you get error in above command the create the rule
 Create the StudentRule before adding the target:
 ```cmd
@@ -48,9 +70,6 @@ Confirm that the rule was created:
 ```cmd
 aws --endpoint-url=http://localhost:4566 events list-rules --event-bus-name StudentEventBus
 ```
-
-
-
 
 
 
