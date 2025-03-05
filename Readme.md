@@ -345,6 +345,8 @@ public static class TimerFunction
 - Monitor logs in AWS CloudWatch and Azure Application Insights.
 - Test and scale based on requirements.
 
+Reference : What is SQS Queue : https://www.youtube.com/watch?v=CyYZ3adwboc
+
 ---
 
 **Author:** Your Name  
