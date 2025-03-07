@@ -353,3 +353,128 @@ Reference : What is SQS Queue : https://www.youtube.com/watch?v=CyYZ3adwboc
 **License:** MIT  
 **Last Updated:** YYYY-MM-DD
 
+
+
+
+
+
+
+Here’s your **GitHub README.md** file with the full explanation and AWS CLI commands for setting up **Azure Function to consume AWS EventBridge events in chronological order**.
+
+---
+
+# **🚀 Consuming AWS EventBridge Events in Azure Function (Chronologically)**
+This guide explains how to **directly consume AWS EventBridge events in an Azure Function** while maintaining **chronological order**.  
+
+### **📌 Two Approaches**
+1. **Recommended ✅** → **EventBridge → API Destination → Azure Function (Webhook)**
+   - Ensures event ordering.
+   - No extra AWS services needed.
+2. **Alternative** → **EventBridge → SNS → Azure Function**
+   - Easier setup but **event order is not guaranteed**.
+
+---
+
+## **1️⃣ Approach 1: EventBridge → API Destination → Azure Function (Best for Chronological Order ✅)**
+This approach **directly sends EventBridge events to an Azure Function via HTTP Webhook**.
+
+### **Step 1: Create an Azure Function (HTTP Trigger)**
+```csharp
+[FunctionName("EventBridgeListener")]
+public async Task<IActionResult> Run(
+    [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req, ILogger log)
+{
+    string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+    var eventData = JsonConvert.DeserializeObject<LearnerEvent>(requestBody);
+
+    log.LogInformation($"Received Event: {eventData.EventType} at {eventData.Timestamp}");
+
+    var command = _commandFactory.GetCommand(eventData.EventType);
+    if (command != null)
+    {
+        await command.ExecuteAsync(eventData, "your-jwt-token");
+    }
+    else
+    {
+        log.LogWarning("No command found for event type: {EventType}", eventData.EventType);
+    }
+
+    return new OkResult();
+}
+```
+### **Step 2: Get Your Azure Function URL**
+Deploy the function and copy the **Function URL**  
+(e.g., `https://yourfunction.azurewebsites.net/api/EventBridgeListener`).
+
+### **Step 3: Create an API Destination in AWS EventBridge**
+#### **1️⃣ Create an API Destination for Azure Function**
+```sh
+aws events create-api-destination --name "AzureFunctionDestination" \
+  --connection-arn "arn:aws:events:your-region:your-account-id:connection/AzureConnection" \
+  --invocation-endpoint "https://yourfunction.azurewebsites.net/api/EventBridgeListener" \
+  --http-method "POST"
+```
+✅ **Replace**:
+- `your-region` → Your AWS region  
+- `your-account-id` → Your AWS account ID  
+- `yourfunction.azurewebsites.net` → Your Azure Function URL  
+
+#### **2️⃣ Create an EventBridge Rule to Send Events to Azure**
+```sh
+aws events put-rule --name "SendToAzureFunction" --event-pattern '{
+  "source": ["your.service"],
+  "detail-type": ["LearnerRegistered", "LearnerUpdated"]
+}' --state ENABLED
+```
+#### **3️⃣ Attach API Destination as Target**
+```sh
+aws events put-targets --rule "SendToAzureFunction" --targets '[{
+  "Id": "1",
+  "Arn": "arn:aws:events:your-region:your-account-id:api-destination/AzureFunctionDestination",
+  "RoleArn": "arn:aws:iam::your-account-id:role/EventBridgeToAzureRole"
+}]'
+```
+✅ Now, **EventBridge will send events directly to your Azure Function in order**!
+
+---
+
+## **2️⃣ Approach 2: EventBridge → SNS → Azure Function (Alternative)**
+This approach **uses SNS to deliver events**, but **does not guarantee order**.
+
+### **Step 1: Create an SNS Topic**
+```sh
+aws sns create-topic --name EventBridgeTopic
+```
+### **Step 2: Subscribe Azure Function to SNS**
+```sh
+aws sns subscribe --topic-arn "arn:aws:sns:your-region:your-account-id:EventBridgeTopic" \
+  --protocol "https" --notification-endpoint "https://yourfunction.azurewebsites.net/api/EventBridgeListener"
+```
+### **Step 3: Configure EventBridge to Publish to SNS**
+```sh
+aws events put-targets --rule "SendToSNS" --targets '[{
+  "Id": "1",
+  "Arn": "arn:aws:sns:your-region:your-account-id:EventBridgeTopic"
+}]'
+```
+✅ Now, **EventBridge will send events to SNS, which will forward them to your Azure Function**.  
+🚨 **BUT SNS does NOT guarantee chronological order!** If ordering is important, use **API Destination (Approach 1).**
+
+---
+
+## **🎯 Which Approach Should You Use?**
+| Approach | Order Guaranteed? | Complexity | Best For |
+|----------|----------------|------------|------------|
+| **EventBridge → API Destination → Azure Function (Recommended ✅)** | ✅ Yes | 🔹 Low | Strict ordering needed |
+| **EventBridge → SNS → Azure Function** | ❌ No | 🔸 Medium | Basic event forwarding |
+
+---
+
+## **✅ Summary**
+- If **ordering matters**, use **EventBridge → API Destination → Azure Function** (Approach 1).  
+- If you **only need event forwarding**, use **SNS** (Approach 2).  
+- **Do NOT use SNS if you need strict ordering**.
+
+🔥 **Now your Azure Function can consume AWS EventBridge events in order!** 🚀  
+Let me know if you need any modifications!
+
